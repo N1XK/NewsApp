@@ -1,10 +1,12 @@
 package com.example.newsapp.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.newsapp.databinding.ItemArticleItemBinding
 import com.example.newsapp.models.Article
 
@@ -22,10 +24,11 @@ class NewsAdapter(private val onItemClicked: (Article) -> Unit) : ListAdapter<Ar
     class ArticleViewHolder(private var binding: ItemArticleItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(article: Article) {
+        fun bind(article: Article, context: Context) {
+            Glide.with(context).load(article.urlToImage).into(binding.ivArticleImage)
             binding.tvTitle.text = article.title
             binding.tvDescription.text = article.description
-            binding.tvSource.text = article.source.name
+            binding.tvSource.text = article.source?.name
             binding.tvPublishAt.text = article.publishedAt
         }
     }
@@ -42,6 +45,6 @@ class NewsAdapter(private val onItemClicked: (Article) -> Unit) : ListAdapter<Ar
         holder.itemView.setOnClickListener {
             onItemClicked(currentArticle)
         }
-        holder.bind(currentArticle)
+        holder.bind(currentArticle, holder.itemView.context)
     }
 }

@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.newsapp.R
-import com.example.newsapp.databinding.FragmentArticleBinding
 import com.example.newsapp.databinding.ItemArticleItemBinding
 import com.example.newsapp.ui.NewsActivity
 import com.example.newsapp.ui.NewsViewModel
