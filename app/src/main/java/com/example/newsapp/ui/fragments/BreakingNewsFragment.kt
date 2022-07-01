@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapters.NewsAdapter
 import com.example.newsapp.databinding.FragmentBreakingNewsBinding
@@ -35,6 +37,12 @@ class BreakingNewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = (activity as NewsActivity).viewModel
+
+        binding.pullToRefresh.setOnRefreshListener {
+            viewModel.refreshBreakingNewsData()
+            binding.pullToRefresh.isRefreshing = false
+        }
+
         setupRecyclerView()
         viewModel.breakingNews.observe(this.viewLifecycleOwner) { response ->
             when(response) {
@@ -47,7 +55,9 @@ class BreakingNewsFragment : Fragment() {
                 is Resource.Error -> {
                     hideProgressBar()
                     response.message?.let { message ->
-                        Log.e(TAG, "An error occured: $message")
+                        Toast.makeText(
+                            requireContext(), "An error occured: $message", Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
                 is Resource.Loading -> {
@@ -66,7 +76,13 @@ class BreakingNewsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter {}
+        newsAdapter = NewsAdapter { article ->
+            val action =
+                BreakingNewsFragmentDirections.actionBreakingNewsFragmentToArticleFragment(
+                    article, TAG
+                )
+            this.findNavController().navigate(action)
+        }
         binding.rvBreakingNews.apply {
             adapter = newsAdapter
             layoutManager = LinearLayoutManager(this.context)

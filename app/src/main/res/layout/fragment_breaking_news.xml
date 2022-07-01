@@ -6,17 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.BreakingNewsFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvBreakingNews"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/pullToRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvBreakingNews"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="50dp"
+            tools:listitem="@layout/item_article_item" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ProgressBar
         android:id="@+id/paginationProgessBar"
@@ -25,7 +32,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/rvBreakingNews"
+        app:layout_constraintBottom_toBottomOf="@+id/pullToRefresh"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
