@@ -13,6 +13,7 @@
         <entry key="app/src/main/res/layout/fragment_saved_news.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/fragment_search_news.xml" value="0.17325227963525835" />
         <entry key="app/src/main/res/layout/item_article_item.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/news_load_state_footer.xml" value="0.1" />
         <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.35520833333333335" />
       </map>
     </option>

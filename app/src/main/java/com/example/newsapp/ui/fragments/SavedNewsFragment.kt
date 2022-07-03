@@ -1,17 +1,17 @@
 package com.example.newsapp.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsapp.R
-import com.example.newsapp.adapters.NewsAdapter
+import com.example.newsapp.adapters.SavedNewsAdapter
 import com.example.newsapp.databinding.FragmentSavedNewsBinding
 import com.example.newsapp.ui.NewsActivity
 import com.example.newsapp.ui.NewsViewModel
@@ -26,7 +26,17 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news) {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: NewsViewModel
-    private lateinit var newsAdapter: NewsAdapter
+    private lateinit var savedNewsAdapter: SavedNewsAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this,
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +53,7 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news) {
         setupRecyclerView()
 
         viewModel.getSavedNews().observe(this.viewLifecycleOwner) { articles ->
-            newsAdapter.submitList(articles)
+            savedNewsAdapter.submitList(articles)
         }
 
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0,
@@ -59,7 +69,7 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news) {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val article = newsAdapter.currentList[position]
+                val article = savedNewsAdapter.currentList[position]
                 viewModel.deleteArticle(article)
                 Snackbar.make(view, "Successfully deleted article", Snackbar.LENGTH_SHORT).apply {
                     setAction("Undo") {
@@ -75,7 +85,7 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news) {
     }
 
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter { article ->
+        savedNewsAdapter = SavedNewsAdapter { article ->
             val action =
                 SavedNewsFragmentDirections.actionSavedNewsFragmentToArticleFragment(
                     article, TAG
@@ -83,7 +93,7 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news) {
             this.findNavController().navigate(action)
         }
         binding.rvSavedNews.apply {
-            adapter = newsAdapter
+            adapter = savedNewsAdapter
             layoutManager = LinearLayoutManager(this.context)
         }
     }

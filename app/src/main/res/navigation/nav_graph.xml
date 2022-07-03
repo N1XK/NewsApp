@@ -24,7 +24,9 @@
         tools:layout="@layout/fragment_saved_news">
         <action
             android:id="@+id/action_savedNewsFragment_to_articleFragment"
-            app:destination="@id/articleFragment" />
+            app:destination="@id/articleFragment"
+            app:popUpTo="@id/savedNewsFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/breakingNewsFragment"
@@ -33,7 +35,9 @@
         tools:layout="@layout/fragment_breaking_news">
         <action
             android:id="@+id/action_breakingNewsFragment_to_articleFragment"
-            app:destination="@id/articleFragment" />
+            app:destination="@id/articleFragment"
+            app:popUpTo="@id/breakingNewsFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/searchNewsFragment"
@@ -42,6 +46,8 @@
         tools:layout="@layout/fragment_search_news">
         <action
             android:id="@+id/action_searchNewsFragment_to_articleFragment"
-            app:destination="@id/articleFragment" />
+            app:destination="@id/articleFragment"
+            app:popUpTo="@id/searchNewsFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 </navigation>

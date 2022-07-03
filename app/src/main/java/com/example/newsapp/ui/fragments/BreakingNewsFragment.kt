@@ -1,19 +1,20 @@
 package com.example.newsapp.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.adapters.NewsAdapter
+import com.example.newsapp.adapters.NewsLoadStateAdapter
+import com.example.newsapp.adapters.NewsPagingAdapter
 import com.example.newsapp.databinding.FragmentBreakingNewsBinding
 import com.example.newsapp.ui.NewsActivity
 import com.example.newsapp.ui.NewsViewModel
-import com.example.newsapp.util.Resource
+import com.example.newsapp.ui.NewsViewModelProviderFactory
 
 private const val TAG = "BreakingNewsFragment"
 
@@ -23,7 +24,18 @@ class BreakingNewsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: NewsViewModel
-    private lateinit var newsAdapter: NewsAdapter
+
+    private lateinit var newsPagingAdapter: NewsPagingAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this,
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,32 +50,10 @@ class BreakingNewsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = (activity as NewsActivity).viewModel
 
-        binding.pullToRefresh.setOnRefreshListener {
-            viewModel.refreshBreakingNewsData()
-            binding.pullToRefresh.isRefreshing = false
-        }
-
         setupRecyclerView()
-        viewModel.breakingNews.observe(this.viewLifecycleOwner) { response ->
-            when(response) {
-                is Resource.Success -> {
-                    hideProgressBar()
-                    response.data?.let { newsResponse ->
-                        newsAdapter.submitList(newsResponse.articles)
-                    }
-                }
-                is Resource.Error -> {
-                    hideProgressBar()
-                    response.message?.let { message ->
-                        Toast.makeText(
-                            requireContext(), "An error occured: $message", Toast.LENGTH_LONG)
-                            .show()
-                    }
-                }
-                is Resource.Loading -> {
-                    showProgressBar()
-                }
-            }
+
+        viewModel.breakingNews.observe(this.viewLifecycleOwner) {
+            newsPagingAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
     }
 
@@ -76,7 +66,7 @@ class BreakingNewsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter { article ->
+        newsPagingAdapter = NewsPagingAdapter { article ->
             val action =
                 BreakingNewsFragmentDirections.actionBreakingNewsFragmentToArticleFragment(
                     article, TAG
@@ -84,8 +74,15 @@ class BreakingNewsFragment : Fragment() {
             this.findNavController().navigate(action)
         }
         binding.rvBreakingNews.apply {
-            adapter = newsAdapter
+            adapter = newsPagingAdapter.withLoadStateHeaderAndFooter(
+                header = NewsLoadStateAdapter { newsPagingAdapter.retry() },
+                footer = NewsLoadStateAdapter { newsPagingAdapter.retry() }
+            )
             layoutManager = LinearLayoutManager(this.context)
+        }
+        binding.pullToRefresh.setOnRefreshListener {
+            newsPagingAdapter.refresh()
+            binding.pullToRefresh.isRefreshing = false
         }
     }
 }

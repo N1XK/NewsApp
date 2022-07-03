@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.example.newsapp.databinding.ItemArticleItemBinding
 import com.example.newsapp.models.Article
 
-class NewsAdapter(private val onItemClicked: (Article) -> Unit) : ListAdapter<Article, NewsAdapter.ArticleViewHolder>(
+class SavedNewsAdapter(private val onItemClicked: (Article) -> Unit) : ListAdapter<Article, SavedNewsAdapter.ArticleViewHolder>(
     object : DiffUtil.ItemCallback<Article>() {
         override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
             return oldItem.url == newItem.url
@@ -43,8 +43,8 @@ class NewsAdapter(private val onItemClicked: (Article) -> Unit) : ListAdapter<Ar
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
         val currentArticle = getItem(position)
         holder.itemView.setOnClickListener {
-            onItemClicked(currentArticle)
+            onItemClicked(currentArticle!!)
         }
-        holder.bind(currentArticle, holder.itemView.context)
+        holder.bind(currentArticle!!, holder.itemView.context)
     }
 }

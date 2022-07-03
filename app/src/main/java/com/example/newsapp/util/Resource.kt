@@ -1,5 +1,6 @@
 package com.example.newsapp.util
 
+//from tutorial, but no use in current app
 sealed class Resource<T>(
     val data: T? = null,
     val message: String? = null
