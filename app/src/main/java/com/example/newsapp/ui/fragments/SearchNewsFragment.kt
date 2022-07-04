@@ -75,6 +75,22 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search_news) {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        binding.rvSearchNews.layoutManager?.onSaveInstanceState()?.let {
+            viewModel.saveRecyclerViewState(it)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.stateInitialized()) {
+            binding.rvSearchNews.layoutManager?.onRestoreInstanceState(
+                viewModel.restoreRecyclerViewState()
+            )
+        }
+    }
+
     private fun hideProgessBar() {
         binding.paginationProgessBar.visibility = View.INVISIBLE
     }

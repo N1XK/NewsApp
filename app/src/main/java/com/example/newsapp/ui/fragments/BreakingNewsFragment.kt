@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.newsapp.adapters.NewsLoadStateAdapter
 import com.example.newsapp.adapters.NewsPagingAdapter
 import com.example.newsapp.databinding.FragmentBreakingNewsBinding
@@ -52,8 +53,24 @@ class BreakingNewsFragment : Fragment() {
 
         setupRecyclerView()
 
-        viewModel.breakingNews.observe(this.viewLifecycleOwner) {
+        viewModel.breakingNews().observe(viewLifecycleOwner) {
             newsPagingAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.rvBreakingNews.layoutManager?.onSaveInstanceState()?.let {
+            viewModel.saveRecyclerViewState(it)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.stateInitialized()) {
+            binding.rvBreakingNews.layoutManager?.onRestoreInstanceState(
+                viewModel.restoreRecyclerViewState()
+            )
         }
     }
 
@@ -73,13 +90,16 @@ class BreakingNewsFragment : Fragment() {
                 )
             this.findNavController().navigate(action)
         }
+
         binding.rvBreakingNews.apply {
-            adapter = newsPagingAdapter.withLoadStateHeaderAndFooter(
+            adapter = newsPagingAdapter.apply {
+            withLoadStateHeaderAndFooter(
                 header = NewsLoadStateAdapter { newsPagingAdapter.retry() },
-                footer = NewsLoadStateAdapter { newsPagingAdapter.retry() }
-            )
+                footer = NewsLoadStateAdapter { newsPagingAdapter.retry() })
+            }
             layoutManager = LinearLayoutManager(this.context)
         }
+
         binding.pullToRefresh.setOnRefreshListener {
             newsPagingAdapter.refresh()
             binding.pullToRefresh.isRefreshing = false

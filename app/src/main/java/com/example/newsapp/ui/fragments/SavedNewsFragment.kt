@@ -84,6 +84,22 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news) {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        binding.rvSavedNews.layoutManager?.onSaveInstanceState()?.let {
+            viewModel.saveRecyclerViewState(it)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.stateInitialized()) {
+            binding.rvSavedNews.layoutManager?.onRestoreInstanceState(
+                viewModel.restoreRecyclerViewState()
+            )
+        }
+    }
+
     private fun setupRecyclerView() {
         savedNewsAdapter = SavedNewsAdapter { article ->
             val action =
